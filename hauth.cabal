@@ -31,6 +31,7 @@ library
     import:           lang
 --    import:           warnings
     exposed-modules:
+        Adapter.HTTP.Main
         Adapter.InMemory.Auth
         Adapter.PostgreSQL.Auth
         Adapter.RabbitMQ.Auth
@@ -49,6 +50,7 @@ library
         data-has,
         exceptions,
         hedis,
+        http-types,
         katip,
         lifted-base,
         mtl,
@@ -57,6 +59,7 @@ library
         postgresql-migration,
         resource-pool,
         safe-exceptions,
+        scotty,
         string-random,
         template-haskell,
         time
