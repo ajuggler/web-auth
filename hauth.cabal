@@ -37,7 +37,6 @@ library
         Domain.Auth
         Domain.Validation
         Lib
-        -- MyLib
     -- other-modules:
     -- other-extensions:
     build-depends:
