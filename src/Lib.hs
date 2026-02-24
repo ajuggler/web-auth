@@ -2,20 +2,23 @@ module Lib where
 
 import ClassyPrelude
 import Control.Monad.Fail (MonadFail (..))
-import Control.Monad.Catch (MonadThrow)
+import Control.Monad.Catch (MonadThrow, MonadCatch)
 import Katip
+import Text.StringRandom
 
 import qualified Adapter.InMemory.Auth as M
 import qualified Adapter.PostgreSQL.Auth as PG
+import qualified Adapter.RabbitMQ.Auth as MQAuth
+import qualified Adapter.RabbitMQ.Common as MQ
 import qualified Adapter.Redis.Auth as Redis
 import Domain.Auth
 
-type State = (PG.State, Redis.State, TVar M.State)
+type State = (PG.State, Redis.State, MQ.State, TVar M.State)
 
 newtype App a = App
   { unApp :: ReaderT State (KatipContextT IO) a
-  } deriving ( Applicative, Functor, Monad, MonadFail, MonadReader State, MonadThrow, MonadIO,
-               KatipContext, Katip )
+  } deriving ( Applicative, Functor, Monad, MonadFail, MonadReader State, MonadIO,
+               MonadThrow, MonadCatch, MonadUnliftIO, KatipContext, Katip )
 
 run :: LogEnv -> State -> App a -> IO a
 run le state = runKatipContextT le () mempty
@@ -29,7 +32,7 @@ instance AuthRepo App where
   findEmailFromUserId = PG.findEmailFromUserId
 
 instance EmailVerificationNotif App where
-  notifyEmailVerification = M.notifyEmailVerification
+  notifyEmailVerification = MQAuth.notifyEmailVerification
 
 instance SessionRepo App where
   newSession = Redis.newSession
@@ -44,13 +47,17 @@ withKatip app =
       stdoutScribe <- mkHandleScribe ColorIfTerminal stdout (permitItem InfoS) V2
       registerScribe "stdout" stdoutScribe defaultScribeSettings logEnv
 
-someFunc :: IO ()
-someFunc = withKatip $ \le -> do
-  mState <- newTVarIO M.initialState
-  PG.withState pgCfg $ \pgState ->
-    Redis.withState redisCfg $ \redisState ->
-      run le (pgState, redisState, mState) action
+withState :: (LogEnv -> State -> IO ()) -> IO ()
+withState action =
+  withKatip $ \le -> do
+    mState <- newTVarIO M.initialState
+    PG.withState pgCfg $ \pgState ->
+      Redis.withState redisCfg $ \redisState ->
+        MQ.withState mqCfg 16 $ \mqState -> do
+          let state = (pgState, redisState, mqState, mState)
+          action le state
   where
+    mqCfg = "amqp://guest:guest@localhost:5672/%2F"
     redisCfg = "redis://localhost:6379/0"
     pgCfg = PG.Config
             { PG.configUrl = "postgresql://localhost/hauth"
@@ -59,17 +66,29 @@ someFunc = withKatip $ \le -> do
             , PG.configIdleConnTimeout = 10
             }
 
+main :: IO ()
+main =
+  withState $ \le state@(_, _, mqState, _) -> do
+    let runner = run le state
+    MQAuth.init mqState runner
+    runner action
+
 action :: App ()
 action = do
-  let email = either undefined id $ mkEmail "eckyy@test.com"
-      pswd = either undefined id $ mkPassword "1234ABCDefghh"
-      auth = Auth email pswd
+  randEmail <- liftIO $ stringRandomIO "[a-z0-9]{5}@test\\.com"
+  let email = either undefined id $ mkEmail randEmail
+      passw = either undefined id $ mkPassword "1234ABCDefgh"
+      auth = Auth email passw
   register auth
-  Just vCode <- M.getNotificationsForEmail email
+  vCode <- pollNotif email
   verifyEmail vCode
   Right session <- login auth
   Just uId <- resolveSessionId session
   Just registeredEmail <- getUser uId
-  putStr "\n"
-  print (session, uId, rawEmail registeredEmail)
-  putStr "\n"
+  print (session, uId, registeredEmail)
+  where
+    pollNotif email = do
+      result <- M.getNotificationsForEmail email
+      case result of
+        Nothing -> pollNotif email
+        Just vCode -> return vCode
