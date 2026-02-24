@@ -31,7 +31,10 @@ library
     import:           lang
 --    import:           warnings
     exposed-modules:
+        Adapter.HTTP.API.Auth
         Adapter.HTTP.Main
+        Adapter.HTTP.Common
+        Adapter.HTTP.Utils
         Adapter.InMemory.Auth
         Adapter.PostgreSQL.Auth
         Adapter.RabbitMQ.Auth
@@ -46,23 +49,38 @@ library
         aeson,
         amqp,
         base ^>=4.18.3.0,
+        blaze-builder,
         classy-prelude,
+        containers,
+        cookie,
         data-has,
+        digestive-functors,
+--        digestive-functors-aeson,
         exceptions,
         hedis,
         http-types,
         katip,
+        lens,
+        lens-aeson,
         lifted-base,
         mtl,
         pcre-heavy,
         postgresql-simple,
         postgresql-migration,
         resource-pool,
+        safe,
         safe-exceptions,
         scotty,
         string-random,
         template-haskell,
-        time
+        text,
+        time,
+        time-lens,
+        vector,
+        wai,
+        wai-extra
+
+        
 
     hs-source-dirs:   src
     default-language: Haskell2010
