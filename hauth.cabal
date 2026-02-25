@@ -32,9 +32,16 @@ library
 --    import:           warnings
     exposed-modules:
         Adapter.HTTP.API.Auth
+        Adapter.HTTP.API.Common
+        Adapter.HTTP.API.Main
+        Adapter.HTTP.API.Utils
         Adapter.HTTP.Main
         Adapter.HTTP.Common
-        Adapter.HTTP.Utils
+        -- Adapter.HTTP.Utils
+        Adapter.HTTP.Web.Auth
+        Adapter.HTTP.Web.Common
+        Adapter.HTTP.Web.Main
+        Adapter.HTTP.Web.Utils
         Adapter.InMemory.Auth
         Adapter.PostgreSQL.Auth
         Adapter.RabbitMQ.Auth
@@ -50,12 +57,16 @@ library
         amqp,
         base ^>=4.18.3.0,
         blaze-builder,
+        blaze-html,
+        bytestring,
         classy-prelude,
         containers,
         cookie,
         data-has,
         digestive-functors,
---        digestive-functors-aeson,
+        digestive-functors-blaze,
+        -- digestive-functors-scotty,
+        -- digestive-functors-aeson,
         exceptions,
         hedis,
         http-types,
@@ -78,7 +89,9 @@ library
         time-lens,
         vector,
         wai,
-        wai-extra
+        wai-middleware-static,
+        wai-extra,
+        warp
 
         
 

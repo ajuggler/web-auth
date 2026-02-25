@@ -12,21 +12,21 @@ import qualified Text.Digestive.Types as DF
 import Web.Cookie
 import Web.Scotty.Trans hiding (getCookie)
 
-import Adapter.HTTP.Utils
+-- import Adapter.HTTP.Utils
 import qualified Domain.Auth as D
 
-parseAndValidateJSON :: (MonadIO m, MonadUnliftIO m, ToJSON v)
-                     => DF.Form v m a -> ActionT m a
-parseAndValidateJSON form = do
-  val <- jsonData `catch` (\(_ :: SomeException) -> return Null)
-  validationResult <- lift $ digestJSON form val
-  case validationResult of
-    (v, Nothing) -> do
-      status status400
-      json $ jsonErrors v
-      finish
-    (_, Just result) ->
-      return result
+-- parseAndValidateJSON :: (MonadIO m, MonadUnliftIO m, ToJSON v)
+--                      => DF.Form v m a -> ActionT m a
+-- parseAndValidateJSON form = do
+--   val <- jsonData `catch` (\(_ :: SomeException) -> return Null)
+--   validationResult <- lift $ digestJSON form val
+--   case validationResult of
+--     (v, Nothing) -> do
+--       status status400
+--       json $ jsonErrors v
+--       finish
+--     (_, Just result) ->
+--       return result
 
 toResult :: Either e a -> DF.Result e a
 toResult = either DF.Error DF.Success
@@ -64,13 +64,13 @@ getCurrentUserId = do
     Nothing -> return Nothing
     Just sId -> lift $ D.resolveSessionId sId
 
-reqCurrentUserId :: (MonadIO m, D.SessionRepo m) => ActionT m D.UserId
-reqCurrentUserId = do
-  mayUserId <- getCurrentUserId
-  case mayUserId of
-    Nothing -> do
-      status status401
-      json ("AuthRequired" :: Text)
-      finish
-    Just userId ->
-      return userId
+-- reqCurrentUserId :: (MonadIO m, D.SessionRepo m) => ActionT m D.UserId
+-- reqCurrentUserId = do
+--   mayUserId <- getCurrentUserId
+--   case mayUserId of
+--     Nothing -> do
+--       status status401
+--       json ("AuthRequired" :: Text)
+--       finish
+--     Just userId ->
+--       return userId

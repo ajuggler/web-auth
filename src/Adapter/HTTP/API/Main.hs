@@ -1,20 +1,16 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Adapter.HTTP.Main where
+module Adapter.HTTP.API.Main where
 
 import ClassyPrelude
 import Katip
+import Network.HTTP.Types.Status
 import Network.Wai
-import Network.Wai.Handler.Warp
-import Network.Wai.Middleware.Vhost
--- import Network.Wai.Middleware.Gzip
--- import Network.HTTP.Types.Status
--- import Web.Scotty.Trans
+import Network.Wai.Middleware.Gzip
+import Web.Scotty.Trans
 
--- import qualified Adapter.HTTP.API.Auth as AuthAPI
--- import Adapter.HTTP.Common
-import qualified Adapter.HTTP.API.Main as API
-import qualified Adapter.HTTP.Web.Main as Web
+import qualified Adapter.HTTP.API.Auth as Auth
+import Adapter.HTTP.API.Common
 import qualified Domain.Auth as D
 
 main :: ( MonadIO m
@@ -24,15 +20,9 @@ main :: ( MonadIO m
         , D.EmailVerificationNotif m
         , D.SessionRepo m
         )
-     => Int -> (m Response -> IO Response) -> IO ()
-main port runner = do
-  web <- Web.main runner
-  api <- API.main runner
-  run port $ vhost [(pathBeginsWith "api", api)] web
-  where
-    pathBeginsWith path req = headMay (pathInfo req) == Just path
+     => (m Response -> IO Response) -> IO Application
+main runner = scottyAppT defaultOptions runner routes
 
-{-
 routes
   :: ( MonadIO m
      , MonadUnliftIO m
@@ -45,11 +35,14 @@ routes
 routes = do
   middleware . gzip $ defaultGzipSettings { gzipFiles = GzipCompress }
 
-  AuthAPI.routes
+  Auth.routes
+
+  notFound $ do
+    status status404
+    json $ errorResponse ("NotFound" :: Text)
 
   defaultHandler $
     Handler $ \(e :: SomeException) -> do
       lift $ $(logTM) ErrorS $ "Unhandled error: " <> ls (displayException e)
       status status500
-      json $ ("InternalServiceError" :: Text)
--}
+      json $ errorResponse ("InternalServiceError" :: Text)

@@ -3,8 +3,8 @@
 {-# LANGUAGE RankNTypes #-}
 
 -- | Run digestive-functors forms against JSON.
--- (Taken from https://github.com/ocharles/digestive-functors-aeson)
-module Adapter.HTTP.Utils
+-- (Based on https://github.com/ocharles/digestive-functors-aeson)
+module Adapter.HTTP.API.Utils
     ( digestJSON
     , jsonErrors
     ) where
