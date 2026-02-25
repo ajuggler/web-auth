@@ -1,3 +1,0 @@
-package pcre-light
-  extra-include-dirs: /opt/homebrew/opt/pcre/include
-  extra-lib-dirs:     /opt/homebrew/opt/pcre/lib

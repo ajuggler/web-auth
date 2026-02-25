@@ -7,12 +7,7 @@ import Katip
 import Network.Wai
 import Network.Wai.Handler.Warp
 import Network.Wai.Middleware.Vhost
--- import Network.Wai.Middleware.Gzip
--- import Network.HTTP.Types.Status
--- import Web.Scotty.Trans
 
--- import qualified Adapter.HTTP.API.Auth as AuthAPI
--- import Adapter.HTTP.Common
 import qualified Adapter.HTTP.API.Main as API
 import qualified Adapter.HTTP.Web.Main as Web
 import qualified Domain.Auth as D
@@ -31,25 +26,3 @@ main port runner = do
   run port $ vhost [(pathBeginsWith "api", api)] web
   where
     pathBeginsWith path req = headMay (pathInfo req) == Just path
-
-{-
-routes
-  :: ( MonadIO m
-     , MonadUnliftIO m
-     , KatipContext m
-     , D.AuthRepo m
-     , D.EmailVerificationNotif m
-     , D.SessionRepo m
-     )
-  => ScottyT m ()
-routes = do
-  middleware . gzip $ defaultGzipSettings { gzipFiles = GzipCompress }
-
-  AuthAPI.routes
-
-  defaultHandler $
-    Handler $ \(e :: SomeException) -> do
-      lift $ $(logTM) ErrorS $ "Unhandled error: " <> ls (displayException e)
-      status status500
-      json $ ("InternalServiceError" :: Text)
--}

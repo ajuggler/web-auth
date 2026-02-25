@@ -74,25 +74,3 @@ main =
     let runner = run le state
     MQAuth.init mqState runner
     HTTP.main port runner
-
-{-
-action :: App ()
-action = do
-  randEmail <- liftIO $ stringRandomIO "[a-z0-9]{5}@test\\.com"
-  let email = either undefined id $ mkEmail randEmail
-      passw = either undefined id $ mkPassword "1234ABCDefgh"
-      auth = Auth email passw
-  register auth
-  vCode <- pollNotif email
-  verifyEmail vCode
-  Right session <- login auth
-  Just uId <- resolveSessionId session
-  Just registeredEmail <- getUser uId
-  print (session, uId, registeredEmail)
-  where
-    pollNotif email = do
-      result <- M.getNotificationsForEmail email
-      case result of
-        Nothing -> pollNotif email
-        Just vCode -> return vCode
--}
