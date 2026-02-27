@@ -4,7 +4,7 @@
 
 -- | Run digestive-functors forms against JSON.
 -- (Based on https://github.com/ocharles/digestive-functors-aeson)
-module Adapter.HTTP.API.Utils
+module Adapter.HTTP.API.Server.Utils
     ( digestJSON
     , jsonErrors
     ) where
@@ -15,7 +15,6 @@ import Data.Aeson (ToJSON(toJSON), Value(..), object)
 import qualified Data.Aeson.Key as Key
 import Data.Aeson.Lens
 import Data.Maybe (fromMaybe)
-import Data.Monoid (mempty)
 import Prelude
 import Safe (readMay)
 import Text.Digestive

@@ -1,17 +1,14 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Adapter.HTTP.API.Common where
+module Adapter.HTTP.API.Server.Common where
 
 import ClassyPrelude
-import Blaze.ByteString.Builder (toLazyByteString)
-import Data.Aeson hiding (json)
-import Data.Time.Lens
+import Data.Aeson
 import Network.HTTP.Types.Status
 import qualified Text.Digestive.Form as DF
-import Web.Cookie
 import Web.Scotty.Trans
 
-import Adapter.HTTP.API.Utils (digestJSON, jsonErrors)
+import Adapter.HTTP.API.Server.Utils (digestJSON, jsonErrors)
 import Adapter.HTTP.Common
 import qualified Domain.Auth as D
 

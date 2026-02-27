@@ -35,21 +35,21 @@ withState connUri prefetchCount action = bracket initState destroyState action'
     action' ((_, pubChan), (_, conChan)) = action (State pubChan conChan)
 
 initExchange :: State -> Text -> IO ()
-initExchange (State pubChan _) exchangeName = do
-  let exchange = newExchange { exchangeName = exchangeName
+initExchange (State pubChan _) exchangeNm = do
+  let exchange = newExchange { exchangeName = exchangeNm
                              , exchangeType = "topic"
                              }
   declareExchange pubChan exchange
 
 initQueue :: State -> Text -> Text -> Text -> IO ()
-initQueue state@(State pubChan _) queueName exchangeName routingKey = do
-  initExchange state exchangeName
-  declareQueue pubChan (newQueue { queueName = queueName })
-  bindQueue pubChan queueName exchangeName routingKey
+initQueue state@(State pubChan _) queueNm exchangeNm routingKey = do
+  initExchange state exchangeNm
+  _ <- declareQueue pubChan (newQueue { queueName = queueNm })
+  bindQueue pubChan queueNm exchangeNm routingKey
 
 initConsumer :: State -> Text -> (Message -> IO Bool) -> IO ()
-initConsumer (State _ conChan) queueName handler = do
-  void . consumeMsgs conChan queueName Ack $ \(msg, env) -> void . fork $ do
+initConsumer (State _ conChan) queueNm handler = do
+  void . consumeMsgs conChan queueNm Ack $ \(msg, env) -> void . fork $ do
     result <- handler msg
     if result then ackEnv env else rejectEnv env False
 
@@ -74,7 +74,7 @@ consumeAndProcess msg handler =
         Left err -> withMsgAndErr msg (displayException err) $ do
           $(logTM) ErrorS "There was an exception when processing the msg. Rejecting."
           return False
-        Right bool -> return bool
+        Right bool' -> return bool'
 
 withMsgAndErr :: (KatipContext m, ToJSON e) => Message -> e -> m a -> m a
 withMsgAndErr msg err =

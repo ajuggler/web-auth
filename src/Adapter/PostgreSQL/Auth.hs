@@ -36,13 +36,13 @@ withPool :: Config -> (State -> IO a) -> IO a
 withPool cfg action =
   bracket initPool cleanPool action
   where
-    initPool = createPool openConn closeConn
-                (configStripeCount cfg)
-                (configIdleConnTimeout cfg)
-                (configMaxOpenConnPerStripe cfg)
+    initPool = newPool poolCfg
     cleanPool = destroyAllResources
     openConn = connectPostgreSQL (configUrl cfg)
     closeConn = close
+    poolCfg = defaultPoolConfig openConn closeConn
+                (realToFrac $ configIdleConnTimeout cfg)
+                ((configStripeCount cfg) * (configMaxOpenConnPerStripe cfg))
 
 withState :: Config -> (State -> IO a) -> IO a
 withState cfg action =

@@ -1,4 +1,5 @@
 *~
 *.org
+*.local
 tmp_*
 dist-newstyle/

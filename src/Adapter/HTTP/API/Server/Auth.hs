@@ -1,14 +1,14 @@
-module Adapter.HTTP.API.Auth where
+module Adapter.HTTP.API.Server.Auth where
 
 import ClassyPrelude
-import Data.Aeson hiding (json, (.:))
 import Katip
 import Network.HTTP.Types.Status
 import Text.Digestive.Form ((.:))
 import qualified Text.Digestive.Form as DF
 import Web.Scotty.Trans
 
-import Adapter.HTTP.API.Common
+import Adapter.HTTP.API.Server.Common
+import Adapter.HTTP.API.Types.Auth ()
 import Adapter.HTTP.Common
 import qualified Domain.Auth as D
 
@@ -20,9 +20,9 @@ routes = do
     input <- parseAndValidateJSON authForm
     domainResult <- lift $ D.register input
     case domainResult of
-      Left D.RegistrationErrorEmailTaken -> do
+      Left err -> do
         status status400
-        json ("EmailTaken" :: Text)
+        json err
       Right _ ->
         return ()
 
@@ -31,9 +31,9 @@ routes = do
     input <- parseAndValidateJSON verifyEmailForm
     domainResult <- lift $ D.verifyEmail input
     case domainResult of
-      Left D.EmailVerificationErrorInvalidCode -> do
+      Left err -> do
         status status400
-        json ("InvalidCode" :: Text)
+        json err
       Right _ ->
         return ()
 
@@ -42,12 +42,9 @@ routes = do
     input <- parseAndValidateJSON authForm
     domainResult <- lift $ D.login input
     case domainResult of
-      Left D.LoginErrorInvalidAuth -> do
+      Left err -> do
         status status400
-        json ("InvalidAuth" :: Text)
-      Left D.LoginErrorEmailNotVerified -> do
-        status status400
-        json ("EmailNotVerified" :: Text)
+        json err
       Right sId -> do
         setSessionIdInCookie sId
         return ()
@@ -60,7 +57,7 @@ routes = do
       Nothing ->
         throwString "Should not happen: SessionId map to invalid UserId"
       Just email ->
-        json $ D.rawEmail email
+        json $ email
 
 authForm :: Monad m => DF.Form [Text] m D.Auth
 authForm =

@@ -43,3 +43,4 @@ findUserIdBySessionId sId = do
   case result of
     Right (Just uIdStr) -> return . readMay . unpack . decodeUtf8 $ uIdStr
     Left err -> throwString $ "Unexpected redis error: " <> show err
+    _ -> throwString "Unexpected redis error"

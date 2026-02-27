@@ -44,10 +44,6 @@ newtype Email = Email { emailRaw :: Text } deriving (Show, Eq, Ord)
 data RegistrationError = RegistrationErrorEmailTaken
   deriving (Show, Eq)
 
-data EmailValidationErr = EmailValidationErrInvalidEmail
-
-newtype PasswordValidationErr = PasswordValidationErr Text
-
 data EmailVerificationError = EmailVerificationErrorInvalidCode
   deriving (Show, Eq)
 

@@ -4,7 +4,6 @@ import ClassyPrelude
 import Control.Monad.Fail (MonadFail (..))
 import Control.Monad.Catch (MonadThrow, MonadCatch)
 import Katip
-import Text.StringRandom
 
 import qualified Adapter.HTTP.Main as HTTP
 import qualified Adapter.InMemory.Auth as M

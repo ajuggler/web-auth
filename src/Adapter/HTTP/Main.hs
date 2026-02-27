@@ -8,7 +8,7 @@ import Network.Wai
 import Network.Wai.Handler.Warp
 import Network.Wai.Middleware.Vhost
 
-import qualified Adapter.HTTP.API.Main as API
+import qualified Adapter.HTTP.API.Server.Main as API
 import qualified Adapter.HTTP.Web.Main as Web
 import qualified Domain.Auth as D
 

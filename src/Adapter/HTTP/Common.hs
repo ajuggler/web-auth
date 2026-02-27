@@ -4,10 +4,7 @@ module Adapter.HTTP.Common where
 
 import ClassyPrelude
 import Blaze.ByteString.Builder (toLazyByteString)
-import Data.Aeson hiding (json)
 import Data.Time.Lens
-import Network.HTTP.Types.Status
-import qualified Text.Digestive.Form as DF
 import qualified Text.Digestive.Types as DF
 import Web.Cookie
 import Web.Scotty.Trans hiding (getCookie)

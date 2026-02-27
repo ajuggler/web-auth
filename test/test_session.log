@@ -1,0 +1,83 @@
+192:hauth antonio$ 
+192:hauth antonio$ cabal repl
+
+> -- switch to client module
+> :m Adapter.HTTP.API.Client.Auth
+> 
+> import ClassyPrelude
+> import Adapter.HTTP.API.Client.Common
+> import qualified Domain.Auth as D
+> 
+> -- Define a helper function to run the client that connects to localhost:3000
+> let cfg = Config "http://localhost:3000"
+> let run action = withState cfg $ \state -> flip runReaderT state $ action
+> 
+> -- Define the `D.Auth` data structure that we use for testing
+> let (Right auth) = D.Auth <$> D.mkEmail "hi@hello.com" <*> D.mkPassword "abcDEF123"
+> 
+> -- Successful registration text
+> run $ register auth
+Right ()
+> 
+> -- Failed registration test due to duplicate email
+> run $ register auth
+Left RegistrationErrorEmailTaken
+> 
+> -- Failed login test due to email not yet verified
+> run $ login auth
+Left LoginErrorEmailNotVerified
+> 
+> -- Failed verifyEmail command test due to wrong verification code
+> run $ verifyEmail "wrongCode"
+Left EmailVerificationErrorInvalidCode
+> 
+> -- We open the database and get the verification
+> -- This verifyEmail command should be successful now
+> run $ verifyEmail "\"hi@hello.com\"_TKccAJyQRGxnYfVX"
+Right ()
+> 
+> -- Try login again, this should now be successful since email has been verified
+> Right session <- run $ login auth
+> 
+> -- Get the email of current user using the session we get from previous step
+> run $ getUser session
+Email {emailRaw = "hi@hello.com"}
+> 
+> -- We now turn off the server
+> 
+> -- Try to get the user info again now that we have turned off the server
+> -- (We should get an exception)
+> run $ getUser session
+*** Exception: UnexpectedResponse Request {
+  host                 = "localhost"
+  port                 = 3000
+  secure               = False
+  requestHeaders       = [("Content-Type","application/json; charset=utf-8")]
+  path                 = "/api/users"
+  queryString          = ""
+  method               = "GET"
+  proxy                = Nothing
+  rawBody              = False
+  redirectCount        = 10
+  responseTimeout      = ResponseTimeoutDefault
+  requestVersion       = HTTP/1.1
+  proxySecureMode      = ProxySecureWithConnect
+}
+ (Response {responseStatus = Status {statusCode = 500, statusMessage = "Internal Server Error"}, responseVersion = HTTP/1.1, responseHeaders = [("Transfer-Encoding","chunked"),("Date","Thu, 26 Feb 2026 06:21:30 GMT"),("Server","Warp/3.4.12"),("Content-Encoding","gzip"),("Content-Type","text/plain; charset=utf-8"),("Vary","Accept-Encoding")], responseBody = "Internal Server Error", responseCookieJar = CJ {expose = [Cookie {cookie_name = "sId", cookie_value = "FspS2i3RyOu4Bkli0dySfOIICf1KeV5T", cookie_expiry_time = 2026-03-26 06:17:18 UTC, cookie_domain = "localhost", cookie_path = "/", cookie_creation_time = 2026-02-26 06:17:18.588056 UTC, cookie_last_access_time = 2026-02-26 06:21:30.718561 UTC, cookie_persistent = True, cookie_host_only = True, cookie_secure_only = False, cookie_http_only = True}]}, responseClose' = ResponseClose, responseOriginalRequest = Request {
+  host                 = "localhost"
+  port                 = 3000
+  secure               = False
+  requestHeaders       = [("Cookie","sId=FspS2i3RyOu4Bkli0dySfOIICf1KeV5T"),("Content-Type","application/json; charset=utf-8")]
+  path                 = "/api/users"
+  queryString          = ""
+  method               = "GET"
+  proxy                = Nothing
+  rawBody              = False
+  redirectCount        = 10
+  responseTimeout      = ResponseTimeoutDefault
+  requestVersion       = HTTP/1.1
+  proxySecureMode      = ProxySecureWithConnect
+}
+, responseEarlyHints = []})
+> 
+> -- All tests passed!!

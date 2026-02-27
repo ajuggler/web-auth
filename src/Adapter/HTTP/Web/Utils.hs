@@ -5,10 +5,8 @@ module Adapter.HTTP.Web.Utils
     ) where
 
 import           ClassyPrelude
-import           Control.Monad         (liftM)
 import qualified Data.Text             as T
 import qualified Data.ByteString.Char8 as B
-import qualified Data.Text.Lazy        as TL
 import qualified Web.Scotty.Trans      as Scotty
 import           Network.Wai           (requestMethod)
 import           Network.Wai.Parse     (fileName)

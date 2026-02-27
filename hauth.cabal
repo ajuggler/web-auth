@@ -29,15 +29,18 @@ common warnings
 
 library
     import:           lang
---    import:           warnings
+    import:           warnings
     exposed-modules:
-        Adapter.HTTP.API.Auth
-        Adapter.HTTP.API.Common
-        Adapter.HTTP.API.Main
-        Adapter.HTTP.API.Utils
+        Adapter.HTTP.API.Client.Auth
+        Adapter.HTTP.API.Client.Common
+        Adapter.HTTP.API.Server.Auth
+        Adapter.HTTP.API.Server.Common
+        Adapter.HTTP.API.Server.Main
+        Adapter.HTTP.API.Server.Utils
+        Adapter.HTTP.API.Types.AesonHelper
+        Adapter.HTTP.API.Types.Auth
         Adapter.HTTP.Main
         Adapter.HTTP.Common
-        -- Adapter.HTTP.Utils
         Adapter.HTTP.Web.Auth
         Adapter.HTTP.Web.Common
         Adapter.HTTP.Web.Main
@@ -65,10 +68,10 @@ library
         data-has,
         digestive-functors,
         digestive-functors-blaze,
-        -- digestive-functors-scotty,
-        -- digestive-functors-aeson,
         exceptions,
         hedis,
+        http-client,
+        http-client-tls,
         http-types,
         katip,
         lens,
@@ -92,9 +95,6 @@ library
         wai-middleware-static,
         wai-extra,
         warp
-
-        
-
     hs-source-dirs:   src
     default-language: Haskell2010
 
