@@ -106,9 +106,9 @@ executable hauth
     build-depends:
         base ^>=4.18.3.0,
         hauth
-
     hs-source-dirs:   app
     default-language: Haskell2010
+    ghc-options: -threaded -rtsopts
 
 test-suite hauth-test
     import:           warnings
