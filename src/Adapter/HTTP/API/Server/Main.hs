@@ -6,6 +6,7 @@ import ClassyPrelude
 import Katip
 import Network.HTTP.Types.Status
 import Network.Wai
+import Network.Wai.Middleware.Cors
 import Network.Wai.Middleware.Gzip
 import Web.Scotty.Trans
 
@@ -21,7 +22,15 @@ main :: ( MonadIO m
         , D.SessionRepo m
         )
      => (m Response -> IO Response) -> IO Application
-main runner = scottyAppT defaultOptions runner routes
+main runner =
+  cors (const $ Just policy) <$> scottyAppT defaultOptions runner routes
+  where
+    policy =
+      simpleCorsResourcePolicy
+        { corsOrigins = Just (["http://localhost:5173"], True)
+        , corsMethods = ["GET","POST","PUT","PATCH","DELETE","OPTIONS"]
+        , corsRequestHeaders = ["Content-Type","Authorization"]
+        }
 
 routes
   :: ( MonadIO m
