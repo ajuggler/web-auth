@@ -1,21 +1,28 @@
 import { useEffect, useState } from 'react';
-import { apiRequest } from '../api/client';
+import { useNavigate } from 'react-router-dom';
+import { getUser, isUnauthenticatedError } from '../api/client';
 
 export default function UsersPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState<string>('');
 
   useEffect(() => {
     async function loadUser() {
       try {
-        const response = await apiRequest<string>('/users');
+        const response = await getUser();
         setEmail(response);
-      } catch {
+      } catch (error) {
+        if (isUnauthenticatedError(error)) {
+          navigate('/auth/login', { replace: true });
+          return;
+        }
+
         setEmail('Unknown');
       }
     }
 
     void loadUser();
-  }, []);
+  }, [navigate]);
 
   return (
     <>

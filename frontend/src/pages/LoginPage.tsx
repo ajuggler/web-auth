@@ -1,11 +1,7 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ApiError, apiRequest } from '../api/client';
-
-type LoginErrorBody = {
-  tag?: string;
-};
+import { ApiError, login } from '../api/client';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -18,20 +14,12 @@ export default function LoginPage() {
     setMessage(null);
 
     try {
-      await apiRequest<null>('/auth/login', 'POST', { email, password });
+      await login({ email, password });
       navigate('/');
     } catch (error) {
       if (error instanceof ApiError) {
-        const body = error.body as LoginErrorBody | null;
-        if (body?.tag === 'EmailNotVerified') {
-          setMessage('Email has not been verified');
-          return;
-        }
-
-        if (body?.tag === 'InvalidAuth') {
-          setMessage('Email/password is incorrect');
-          return;
-        }
+        setMessage(error.uiMessage);
+        return;
       }
 
       setMessage('Something went wrong');

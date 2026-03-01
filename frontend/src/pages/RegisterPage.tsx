@@ -1,15 +1,11 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ApiError, apiRequest } from '../api/client';
+import { ApiError, register } from '../api/client';
 
 type FormErrors = {
   email?: string;
   password?: string;
-};
-
-type RegistrationErrorBody = {
-  tag?: string;
 };
 
 function validateEmail(email: string): string | undefined {
@@ -49,16 +45,13 @@ export default function RegisterPage() {
     }
 
     try {
-      await apiRequest<null>('/auth/register', 'POST', { email, password });
+      await register({ email, password });
       setMessage('Registered successfully');
       setPassword('');
     } catch (error) {
       if (error instanceof ApiError) {
-        const body = error.body as RegistrationErrorBody | null;
-        if (body?.tag === 'EmailTaken') {
-          setMessage('Email has been taken');
-          return;
-        }
+        setMessage(error.uiMessage);
+        return;
       }
       setMessage('Something went wrong');
     }
