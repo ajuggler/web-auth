@@ -1,15 +1,26 @@
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { apiRequest } from '../api/client';
 
 export default function UsersPage() {
+  const [email, setEmail] = useState<string>('');
+
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const response = await apiRequest<string>('/users');
+        setEmail(response);
+      } catch {
+        setEmail('Unknown');
+      }
+    }
+
+    void loadUser();
+  }, []);
+
   return (
-    <main>
-      <img src="/images/logo.png" alt="Application logo" width={120} height={120} />
+    <>
       <h1>Users</h1>
-      <p>This is the default post-auth landing route.</p>
-      <nav>
-        <Link to="/login">Login</Link> | <Link to="/register">Register</Link> |{' '}
-        <Link to="/verify-email">Verify Email</Link>
-      </nav>
-    </main>
+      <p>Current user email: {email}</p>
+    </>
   );
 }

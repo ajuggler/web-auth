@@ -2,6 +2,22 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
+export class ApiError extends Error {
+  status: number;
+  body: unknown;
+
+  constructor(message: string, status: number, body: unknown) {
+    super(message);
+    this.status = status;
+    this.body = body;
+  }
+}
+
+function isJsonResponse(response: Response): boolean {
+  const contentType = response.headers.get('content-type');
+  return contentType?.includes('application/json') ?? false;
+}
+
 export async function apiRequest<TResponse>(
   path: string,
   method: HttpMethod = 'GET',
@@ -16,9 +32,12 @@ export async function apiRequest<TResponse>(
     credentials: 'include',
   });
 
+  const hasBody = response.status !== 204;
+  const parsedBody = hasBody && isJsonResponse(response) ? await response.json() : null;
+
   if (!response.ok) {
-    throw new Error(`API request failed: ${response.status}`);
+    throw new ApiError(`API request failed: ${response.status}`, response.status, parsedBody);
   }
 
-  return (await response.json()) as TResponse;
+  return parsedBody as TResponse;
 }
