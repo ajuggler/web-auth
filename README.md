@@ -111,7 +111,7 @@ brew services start redis
 ```
 redis://localhost:6379/0
 ```
-(In Haskell code we have hardcoded the default connection URLs: `amqp://guest:guest@localhost:5672/` and `redis://localhost:6379/0`.)
+(We have configured the default connection URLs: `amqp://guest:guest@localhost:5672/` and `redis://localhost:6379/0`.)
 
 ## Starting the Web Service
 
