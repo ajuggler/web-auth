@@ -62,6 +62,67 @@ Although the project is experimental in nature, it integrates several **producti
 
 The project is built around the **Haskell ecosystem**, and includes a Haskell client library for interacting with the service via the RESTful API.
 
+## Local Setup
+
+### Requirements
+
+* **PostgreSQL 16**
+* **RabbitMQ**
+* **Redis**
+* **GHC 9.6.7** (project was built and tested with this version)
+* `cabal`
+
+The instructions below assume **macOS with Homebrew**.
+
+## Starting Auxiliary Services
+
+### 1) PostgreSQL
+
+Start (or restart) the service:
+
+```bash
+brew services start postgresql@16
+```
+
+Create the project database:
+
+```bash
+createdb hauth
+```
+
+You can verify that the database exists:
+
+```bash
+psql -l
+```
+
+### 2) RabbitMQ
+
+```bash
+brew services start rabbitmq
+```
+
+### 3) Redis
+
+```bash
+brew services start redis
+```
+
+```
+redis://localhost:6379/0
+```
+(In Haskell code we have hardcoded the default connection URLs: `amqp://guest:guest@localhost:5672/` and `redis://localhost:6379/0`.)
+
+## Starting the Web Service
+
+From the project root:
+
+```bash
+cabal run
+```
+
+The service will start on the configured port: `localhost:3000`.
+
 ## Credits
 
 This project is inspired by the tutorials presented in:
