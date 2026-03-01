@@ -74,9 +74,9 @@ The project is built around the **Haskell ecosystem**, and includes a Haskell cl
 
 The instructions below assume **macOS with Homebrew**.
 
-## Starting Auxiliary Services
+### Starting Auxiliary Services
 
-### 1) PostgreSQL
+#### 1) PostgreSQL
 
 Start (or restart) the service:
 
@@ -96,13 +96,13 @@ You can verify that the database exists:
 psql -l
 ```
 
-### 2) RabbitMQ
+#### 2) RabbitMQ
 
 ```bash
 brew services start rabbitmq
 ```
 
-### 3) Redis
+#### 3) Redis
 
 ```bash
 brew services start redis
@@ -113,7 +113,7 @@ redis://localhost:6379/0
 ```
 (We have configured the default connection URLs: `amqp://guest:guest@localhost:5672/` and `redis://localhost:6379/0`.)
 
-## Starting the Web Service
+### Starting the Web Service
 
 From the project root:
 
