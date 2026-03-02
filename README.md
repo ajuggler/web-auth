@@ -10,6 +10,20 @@ The system exposes:
 
 ---
 
+## Architecture & Systems
+
+Although the project is experimental in nature, it integrates several **production-ready systems**:
+
+* **Katip** — structured logging
+* **PostgreSQL** — persistent user storage (email, password hash, etc.)
+* **RabbitMQ** — background email dispatching (verification emails)
+* **Redis** — in-memory storage for authentication/session tokens
+* **MailHog** — email testing tool
+
+The project is built around the **Haskell ecosystem**, and includes a Haskell client library for interacting with the service via the RESTful API.
+
+---
+
 ## Features
 
 ### 🔐 Authentication Flow
@@ -52,20 +66,6 @@ The system exposes:
 * Upon successful login, the user is redirected to a protected **User page**.
 * Authentication status is stored via cookies.
 * Tokens are managed using an in-memory store.
-
----
-
-## Architecture & Systems
-
-Although the project is experimental in nature, it integrates several **production-ready systems**:
-
-* **Katip** — structured logging
-* **PostgreSQL** — persistent user storage (email, password hash, etc.)
-* **RabbitMQ** — background email dispatching (verification emails)
-* **Redis** — in-memory storage for authentication/session tokens
-* **MailHog** — email testing tool
-
-The project is built around the **Haskell ecosystem**, and includes a Haskell client library for interacting with the service via the RESTful API.
 
 ---
 
