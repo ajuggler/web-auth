@@ -52,8 +52,6 @@ library
         Domain.Auth
         Domain.Validation
         Lib
-    -- other-modules:
-    -- other-extensions:
     build-depends:
         aeson                    ^>=2.2.3.0,
         amqp                     ^>=0.24.0,
@@ -87,8 +85,8 @@ library
         string-random            ^>=0.1.4.5,
         template-haskell         ^>=2.20.0.0,
         text                     ^>=2.0.2,
-        smtp-mail,
-        mime-mail,
+        smtp-mail                ^>=0.5.0.0,
+        mime-mail                ^>=0.5.1,
         time                     ^>=1.12.2,
         time-lens                ^>=0.4.0.2,
         vector                   ^>=0.13.2.0,

@@ -5,17 +5,17 @@ import Control.Monad.Catch (MonadCatch)
 import Katip
 import Network.AMQP (Message)
 import Network.Mail.Mime (Address (..), simpleMail')
-import Network.Mail.SMTP (sendMail)
+import Network.Mail.SMTP (sendMail')
 
 import qualified Adapter.RabbitMQ.Auth as MQAuth
 import Adapter.RabbitMQ.Common
 import qualified Domain.Auth as D
 
+smtpHost :: String
+smtpHost = "localhost"
+
 smtpPort :: Int
 smtpPort = 1025
-
-smtpHost :: String
-smtpHost = "localhost:" ++ (show smtpPort)
 
 senderAddress :: Address
 senderAddress = Address (Just "HAuth") "no-reply@hauth.local"
@@ -42,7 +42,7 @@ sendEmail email vCode = do
       subject = "Please verify your email"
       body = "Thanks for registering. Verify your account by visiting: " <> verificationLink
       mail = simpleMail' toAddress senderAddress subject (fromStrict body)
-  sendMail smtpHost mail
+  sendMail' smtpHost (fromIntegral smtpPort) mail
 
 init :: (KatipContext m, MonadCatch m, MonadUnliftIO m)
      => State -> (m Bool -> IO Bool) -> IO ()

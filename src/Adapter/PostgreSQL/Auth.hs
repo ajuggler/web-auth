@@ -64,7 +64,7 @@ addAuth (D.Auth email pass) = do
   -- generate vCode
   vCode <- liftIO $ do
     r <- stringRandomIO "[A-Za-z0-9]{16}"
-    return $ (tshow rawEmail) <> "_" <> r
+    return r
   -- issue query
   result <- withConn $ \conn ->
     try $ query conn qry (rawEmail, rawPassw, vCode)
