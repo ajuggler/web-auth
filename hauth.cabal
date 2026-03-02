@@ -47,6 +47,7 @@ library
         Adapter.PostgreSQL.Auth
         Adapter.RabbitMQ.Auth
         Adapter.RabbitMQ.Common
+        Adapter.RabbitMQ.EmailWorker
         Adapter.Redis.Auth
         Domain.Auth
         Domain.Validation
@@ -86,6 +87,8 @@ library
         string-random            ^>=0.1.4.5,
         template-haskell         ^>=2.20.0.0,
         text                     ^>=2.0.2,
+        smtp-mail,
+        mime-mail,
         time                     ^>=1.12.2,
         time-lens                ^>=0.4.0.2,
         vector                   ^>=0.13.2.0,
@@ -103,6 +106,20 @@ executable hauth
     build-depends:
         base ^>=4.18.3.0,
         hauth
+    hs-source-dirs: app
+    default-language: Haskell2010
+    ghc-options: -threaded -rtsopts
+
+executable hauth-email-worker
+    import: warnings
+    import: lang
+    main-is: EmailWorkerMain.hs
+    build-depends:
+        base           ^>=4.18.3.0,
+        classy-prelude ^>=1.5.0.3,
+        exceptions     ^>=0.10.7,
+        hauth,
+        katip          ^>=0.8.8.4
     hs-source-dirs: app
     default-language: Haskell2010
     ghc-options: -threaded -rtsopts

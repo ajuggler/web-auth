@@ -3,10 +3,12 @@
 `web-auth` is a **login and authentication web service** implemented in Haskell.
 It serves as a testbed for showcasing tooling and technologies commonly used in production-grade web development.
 
-The system exposes both:
+The system exposes:
 
-* An HTML MVC web application
-* A RESTful API
+* A RESTful API implemented in Haskell using Scotty.
+* A full-stack web app with a React client
+
+---
 
 ## Features
 
@@ -51,6 +53,8 @@ The system exposes both:
 * Authentication status is stored via cookies.
 * Tokens are managed using an in-memory store.
 
+---
+
 ## Architecture & Systems
 
 Although the project is experimental in nature, it integrates several **production-ready systems**:
@@ -59,17 +63,21 @@ Although the project is experimental in nature, it integrates several **producti
 * **PostgreSQL** — persistent user storage (email, password hash, etc.)
 * **RabbitMQ** — background email dispatching (verification emails)
 * **Redis** — in-memory storage for authentication/session tokens
+* **MailHog** — email testing tool
 
 The project is built around the **Haskell ecosystem**, and includes a Haskell client library for interacting with the service via the RESTful API.
+
+---
 
 ## Local Setup
 
 ### Requirements
 
-* **PostgreSQL 16**
-* **RabbitMQ**
-* **Redis**
-* **GHC 9.6.7** (project was built and tested with this version)
+* PostgreSQL 16
+* RabbitMQ
+* Redis
+* MailHog
+* GHC 9.6.7 (project was built and tested with this version)
 * `cabal`
 
 The instructions below assume **macOS with Homebrew**.
@@ -108,27 +116,31 @@ brew services start rabbitmq
 brew services start redis
 ```
 
+#### 4) MailHog
+
+```bash
+brew services start mailhog
 ```
-redis://localhost:6379/0
-```
-(We have configured the default connection URLs: `amqp://guest:guest@localhost:5672/` and `redis://localhost:6379/0`.)
+
+Access Web UI at [http://localhost:8025](http://localhost:8025).
+
+(We have configured the default connection URLs: `amqp://guest:guest@localhost:5672/` and `redis://localhost:6379/0`, `mailhog-smtp://localhost:1025`.)
 
 ### Starting the Backend Service
 
 From the project root:
 
 ```bash
-cabal run
+cabal run hauth
 ````
 
-The Haskell backend service will start on the configured port
-(default: [http://localhost:3000](http://localhost:3000)).
+The Haskell backend service will start on the configured port (default: [http://localhost:3000](http://localhost:3000)).
 
 ### Starting the React Client
 
 Ensure the backend service is running before starting the client.
 
-From the project root:
+In a separate terminal and from the project root:
 
 ```bash
 cd frontend
@@ -140,6 +152,18 @@ The development server will start (typically at [http://localhost:5173](http://l
 The frontend is configured to proxy API requests to the backend during development.
 
 *Note:* Running the React-based client is optional, as a Haskell-based web app is accessible on the same port as the backend service.
+
+### Starting the Email Worker
+
+Run the dedicated email-worker process in a separate terminal:
+
+```bash
+cabal run hauth-email-worker
+```
+
+The worker consumes verification events from RabbitMQ and sends emails through SMTP (`localhost:1025`, compatible with MailHog).
+
+---
 
 ## Credits
 

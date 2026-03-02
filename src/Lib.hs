@@ -69,7 +69,6 @@ withState action =
 
 main :: IO ()
 main =
-  withState $ \port le state@(_, _, mqState, _) -> do
+  withState $ \port le state -> do
     let runner = run le state
-    MQAuth.init mqState runner
     HTTP.main port runner
